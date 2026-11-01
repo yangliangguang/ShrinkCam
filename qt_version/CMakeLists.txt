@@ -26,6 +26,10 @@ set(HEADERS
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
+if(WIN32)
+    target_sources(${PROJECT_NAME} PRIVATE shrinkcam.rc)
+endif()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt5::Widgets
     Qt5::Multimedia

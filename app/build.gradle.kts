@@ -11,8 +11,8 @@ android {
         applicationId = "com.shrinkcam.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 24
-        versionName = "1.2.5"
+        versionCode = 26
+        versionName = "1.3.0"
         vectorDrawables { useSupportLibrary = true }
     }
 

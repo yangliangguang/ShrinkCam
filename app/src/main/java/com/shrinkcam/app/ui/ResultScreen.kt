@@ -63,24 +63,32 @@ fun ResultScreen(vm: MainViewModel) {
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp)
     ) {
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                Icons.Filled.ArrowBack, null, tint = TextMain,
-                modifier = Modifier
-                    .size(22.dp)
+            Row(
+                Modifier
+                    .clip(RoundedCornerShape(8.dp))
                     .clickable { vm.backHome() }
-            )
-            Spacer(Modifier.width(12.dp))
-            Text("压缩完成", color = TextMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    .padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Filled.ArrowBack, null, tint = Accent, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(3.dp))
+                Text("返回", color = Accent, fontSize = 17.sp)
+            }
+            Spacer(Modifier.weight(1f))
+            Text("压缩完成", color = TextMain, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.weight(1f))
             Text(
                 "再次拍摄",
-                color = Accent, fontSize = 13.sp,
-                modifier = Modifier.clickable {
-                    vm.backHome()
-                    vm.clearPending()
-                }
+                color = Accent, fontSize = 17.sp,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable {
+                        vm.backHome()
+                        vm.clearPending()
+                    }
+                    .padding(vertical = 4.dp)
             )
         }
 
@@ -90,23 +98,27 @@ fun ResultScreen(vm: MainViewModel) {
         Column(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(22.dp))
-                .background(Brush.linearGradient(listOf(Color(0xFF17372F), Color(0xFF132A28))))
-                .padding(20.dp),
+                .clip(RoundedCornerShape(16.dp))
+                .background(Card)
+                .padding(vertical = 20.dp, horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("体积减少", color = TextSub, fontSize = 12.sp)
+            Text("体积减少", color = TextSub, fontSize = 13.sp)
+            Spacer(Modifier.height(2.dp))
             Text(
                 Fmt.percent(1 - done.outSize.toDouble() / done.job.info.sizeBytes.coerceAtLeast(1)),
-                color = Accent,
-                fontSize = 46.sp,
-                fontWeight = FontWeight.ExtraBold
+                color = Green,
+                fontSize = 52.sp,
+                fontWeight = FontWeight.Bold
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(Fmt.size(done.job.info.sizeBytes), color = TextSub, fontSize = 15.sp)
-                Text("  →  ", color = TextSub, fontSize = 15.sp)
-                Text(Fmt.size(done.outSize), color = TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
+                Text(" → ", color = TextSub, fontSize = 15.sp)
+                Text(Fmt.size(done.outSize), color = TextMain, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
             }
+            Spacer(Modifier.height(4.dp))
+            Box(Modifier.fillMaxWidth(0.5f).height(0.5.dp).background(Separator))
+            Spacer(Modifier.height(6.dp))
             Text(
                 "压缩比 ${Fmt.ratio(done.job.info.sizeBytes, done.outSize)} · 省下 ${Fmt.size(done.job.info.sizeBytes - done.outSize)}",
                 color = TextSub, fontSize = 12.sp
@@ -140,7 +152,7 @@ fun ResultScreen(vm: MainViewModel) {
         Spacer(Modifier.height(12.dp))
         Text(
             "已保存到相册 Movies/压缩相机",
-            color = TextSub, fontSize = 11.sp, textAlign = TextAlign.Center,
+            color = TextSub, fontSize = 12.sp, textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(28.dp))
@@ -151,13 +163,14 @@ fun ResultScreen(vm: MainViewModel) {
 private fun InfoTile(label: String, value: String, modifier: Modifier = Modifier) {
     Column(
         modifier
-            .clip(RoundedCornerShape(14.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(Card)
-            .padding(vertical = 12.dp, horizontal = 10.dp),
+            .padding(vertical = 11.dp, horizontal = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(value, color = TextMain, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-        Text(label, color = TextSub, fontSize = 10.sp)
+        Text(value, color = TextMain, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(1.dp))
+        Text(label, color = TextSub, fontSize = 11.sp)
     }
 }
 
@@ -172,15 +185,15 @@ private fun ActionButton(
     Box(
         modifier
             .height(50.dp)
-            .clip(RoundedCornerShape(15.dp))
-            .background(if (primary) Brush.linearGradient(listOf(Accent, AccentDim)) else Brush.linearGradient(listOf(Card, CardHi)))
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (primary) Accent else Card)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(icon, null, tint = if (primary) Bg else Accent, modifier = Modifier.size(18.dp))
+            Icon(icon, null, tint = if (primary) Color.White else Accent, modifier = Modifier.size(19.dp))
             Spacer(Modifier.width(6.dp))
-            Text(text, color = if (primary) Bg else TextMain, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            Text(text, color = if (primary) Color.White else Accent, fontSize = 17.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
@@ -227,7 +240,7 @@ private fun ComparePlayer(done: Done, replaySignal: Int) {
         Box(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(18.dp))
+                .clip(RoundedCornerShape(16.dp))
                 .background(Color.Black)
         ) {
             AndroidView(
@@ -268,9 +281,9 @@ private fun ComparePlayer(done: Done, replaySignal: Int) {
         Row(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
-                .background(Card)
-                .padding(4.dp)
+                .clip(RoundedCornerShape(9.dp))
+                .background(CardHi)
+                .padding(2.dp)
         ) {
             Seg(
                 "压缩后 ${Fmt.size(done.outSize)}", !showOriginal, Modifier.weight(1f)
@@ -313,17 +326,17 @@ private fun Modifier.rotatePreview(degrees: Int): Modifier =
 private fun Seg(text: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
         modifier
-            .clip(RoundedCornerShape(9.dp))
-            .background(if (selected) CardHi else Color.Transparent)
+            .clip(RoundedCornerShape(7.dp))
+            .background(if (selected) Card else Color.Transparent)
             .clickable { onClick() }
-            .padding(vertical = 9.dp),
+            .padding(vertical = 7.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text,
-            color = if (selected) Accent else TextSub,
-            fontSize = 12.sp,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+            color = if (selected) TextMain else TextSub,
+            fontSize = 13.sp,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
         )
     }
 }

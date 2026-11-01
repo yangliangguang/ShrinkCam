@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -46,27 +47,27 @@ fun ProgressScreen(vm: MainViewModel) {
         Box(contentAlignment = Alignment.Center) {
             androidx.compose.material3.CircularProgressIndicator(
                 progress = { vm.progress },
-                modifier = Modifier.size(148.dp),
+                modifier = Modifier.size(160.dp),
                 color = Accent,
-                trackColor = CardHi,
-                strokeWidth = 9.dp
+                trackColor = Color(0xFFE5E5EA),
+                strokeWidth = 8.dp
             )
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     "${(vm.progress * 100f).toInt()}%",
                     color = TextMain,
-                    fontSize = 34.sp,
-                    fontWeight = FontWeight.Bold
+                    fontSize = 40.sp,
+                    fontWeight = FontWeight.Light
                 )
-                Text(vm.progressText, color = TextSub, fontSize = 11.sp)
+                Text(vm.progressText, color = TextSub, fontSize = 12.sp)
             }
         }
 
         Spacer(Modifier.height(26.dp))
         Text(
             if (vm.passText.isNotBlank()) vm.passText else "正在重新编码…",
-            color = Accent,
-            fontSize = 13.sp,
+            color = TextMain,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center
         )
@@ -78,19 +79,19 @@ fun ProgressScreen(vm: MainViewModel) {
             )
         }
         Spacer(Modifier.height(6.dp))
-        Text("硬编码进行中，请保持屏幕常亮", color = TextSub, fontSize = 11.sp)
+        Text("硬编码进行中，请保持屏幕常亮", color = TextSub, fontSize = 12.sp)
 
         Spacer(Modifier.height(40.dp))
         Box(
             Modifier
                 .width(160.dp)
                 .height(46.dp)
-                .clip(RoundedCornerShape(14.dp))
+                .clip(RoundedCornerShape(12.dp))
                 .background(Card)
                 .clickable { vm.cancelCompress() },
             contentAlignment = Alignment.Center
         ) {
-            Text("取消", color = Warn, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+            Text("取消", color = Warn, fontSize = 16.sp, fontWeight = FontWeight.Normal)
         }
     }
 }

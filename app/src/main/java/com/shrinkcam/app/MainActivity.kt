@@ -117,8 +117,9 @@ private fun Root(vm: MainViewModel) {
     }
 
     when (vm.screen) {
-        Screen.HOME -> HomeScreen(vm = vm, onRecord = openCamera, onPickGallery = openGallery)
+        Screen.HOME -> HomeScreen(vm = vm, onRecord = openCamera, onPickGallery = openGallery, onLibrary = vm::openLibrary)
         Screen.COMPRESSING -> ProgressScreen(vm)
         Screen.RESULT -> ResultScreen(vm)
+        Screen.LIBRARY -> com.shrinkcam.app.ui.LibraryScreen(vm)
     }
 }

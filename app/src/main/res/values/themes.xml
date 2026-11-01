@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.ShrinkCam" parent="android:Theme.Material.NoActionBar">
-        <item name="android:statusBarColor">#0F1720</item>
-        <item name="android:navigationBarColor">#0F1720</item>
-        <item name="android:windowBackground">#0F1720</item>
+    <!-- iOS 浅色底：页面 #F2F2F7，状态栏/导航栏同色，图标用深色 -->
+    <style name="Theme.ShrinkCam" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#F2F2F7</item>
+        <item name="android:navigationBarColor">#F2F2F7</item>
+        <item name="android:windowBackground">#F2F2F7</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
     </style>
 </resources>

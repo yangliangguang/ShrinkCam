@@ -16,7 +16,7 @@ import java.io.File
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 
-enum class Screen { HOME, COMPRESSING, RESULT }
+enum class Screen { HOME, COMPRESSING, RESULT, LIBRARY }
 
 data class Job(
     val id: String,
@@ -65,6 +65,113 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var engineLabel by mutableStateOf("")
     /** 结果页"播放"按钮信号，用于在 App 内重播 */
     var replaySignal by mutableStateOf(0)
+
+    // ---- 视频管理（压缩成功后的作品库） ----
+
+    data class LibItem(val file: File, val name: String, val size: Long, val lastMod: Long)
+
+    val libItems = mutableStateListOf<LibItem>()
+    val libSelected = mutableStateListOf<String>()
+    var libSelectMode by mutableStateOf(false)
+        private set
+    var libLoading by mutableStateOf(false)
+        private set
+
+    private fun videoDir() = File(getApplication<Application>().filesDir, "videos")
+
+    /** 扫描本 App 输出目录里的压缩成品 */
+    fun loadLibrary() {
+        viewModelScope.launch(Dispatchers.IO) {
+            libLoading = true
+            val list = videoDir().listFiles { f -> f.isFile && f.name.startsWith("SHRINK_") && f.name.endsWith(".mp4") }
+                ?.map { LibItem(it, it.name, it.length(), it.lastModified()) }
+                ?.sortedByDescending { it.lastMod }
+                ?: emptyList()
+            withContext(Dispatchers.Main) {
+                libItems.clear()
+                libItems.addAll(list)
+                libSelected.retainAll(list.map { it.name }.toSet())
+                libLoading = false
+            }
+        }
+    }
+
+    fun toggleLibSelect(name: String) {
+        if (libSelected.contains(name)) libSelected.remove(name) else libSelected.add(name)
+        if (libSelected.isEmpty()) libSelectMode = false
+    }
+
+    fun enterLibSelectMode(first: String) {
+        libSelectMode = true
+        if (!libSelected.contains(first)) libSelected.add(first)
+    }
+
+    fun clearLibSelection() {
+        libSelected.clear()
+        libSelectMode = false
+    }
+
+    fun selectAllLib() {
+        libSelected.clear()
+        libItems.forEach { libSelected.add(it.name) }
+    }
+
+    /** 删除选中的视频：本地文件 + 相册同名列 */
+    fun deleteSelectedLib() {
+        val ctx = getApplication<Application>()
+        val targets = libItems.filter { libSelected.contains(it.name) }
+        viewModelScope.launch(Dispatchers.IO) {
+            targets.forEach { item ->
+                runCatching { item.file.delete() }
+                // 同步清理相册 Movies/压缩相机 里的同一条
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    runCatching {
+                        ctx.contentResolver.delete(
+                            android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                            "${android.provider.MediaStore.Video.Media.DISPLAY_NAME}=?",
+                            arrayOf(item.name)
+                        )
+                    }
+                }
+            }
+            withContext(Dispatchers.Main) {
+                libSelected.clear()
+                libSelectMode = false
+                loadLibrary()
+            }
+        }
+    }
+
+    /** 分享单个/多个视频 */
+    fun shareLib(items: List<LibItem>) {
+        val ctx = getApplication<Application>()
+        if (items.isEmpty()) return
+        try {
+            val uris = ArrayList<Uri>()
+            items.forEach { item ->
+                uris.add(
+                    androidx.core.content.FileProvider.getUriForFile(
+                        ctx, "${ctx.packageName}.fileprovider", item.file
+                    )
+                )
+            }
+            val i = if (uris.size == 1) {
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "video/mp4"
+                    putExtra(Intent.EXTRA_STREAM, uris[0])
+                }
+            } else {
+                Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+                    type = "video/mp4"
+                    putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris)
+                }
+            }
+            i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            ctx.startActivity(Intent.createChooser(i, "分享视频").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        } catch (t: Throwable) {
+            error = "分享失败：${t.message}"
+        }
+    }
 
     private val cancelFlag = AtomicBoolean(false)
     private var compressor: VideoCompressor? = null
@@ -224,6 +331,12 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun backHome() {
         screen = Screen.HOME
         current = null
+    }
+
+    fun openLibrary() {
+        loadLibrary()
+        clearLibSelection()
+        screen = Screen.LIBRARY
     }
 
     fun share(done: Done) {
