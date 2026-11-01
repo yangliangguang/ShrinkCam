@@ -1,0 +1,37 @@
+# Android build artifacts
+*.apk
+*.aab
+*.dex
+*.class
+local.properties
+app/build/
+build/
+.gradle/
+
+# Qt build artifacts
+qt_version/build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.exe
+*.o
+*.obj
+*.dll
+*.lib
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Keystore (keep in repo for open source signing demo)
+# keystore/
+
+# Extracted source
+ShrinkCam-1.2.5/
